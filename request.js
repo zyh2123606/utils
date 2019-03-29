@@ -1,7 +1,7 @@
 import Axios from 'axios'
 import { Message } from 'antd'
 
-const http = Axios.create({ baseUrl: '' })
+const http = Axios.create({ baseURL: '' })
 const cancelToken = Axios.CancelToken
 const source = cancelToken.source()
 
