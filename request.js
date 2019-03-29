@@ -4,6 +4,8 @@ import { Message } from 'antd'
 const http = Axios.create({ baseURL: '' })
 const cancelToken = Axios.CancelToken
 const source = cancelToken.source()
+http.interceptors.request.use(req => beforeRequest(req))
+http.interceptors.response.use(response => dataFormat(response), error => dealWithRequestError(error))
 
 //状态处理
 const dealWithRequestError = error => {
@@ -62,22 +64,20 @@ const dataFormat = response => {
 }
 
 //构建请求
-const buildRequest = async (method, url, params, config) => {
+const buildRequest = async (method, url, params={}, config={}) => {
     config = { ...defaultConfig, ...config }
-    http.interceptors.request.use(req => beforeRequest(req))
-    http.interceptors.response.use(response => dataFormat(response), error => dealWithRequestError(error))
     if(method === 'delete') return http[method](url, {params, ...config})
     return http[method](url, params, config)
 }
 
-export const get = (url, params = {}, config = {}) => buildRequest('get', url, params, config)
-export const post = (url, params = {}, config = {}) => buildRequest('post', url, params, config)
-export const put = (url, params = {}, config = {}) => buildRequest('put', url, params, config)
-export const del = (url, params = {}, config = {}) => buildRequest('delete', url, params, config)
+export const get = (url, params, config) => buildRequest('get', url, params, config)
+export const post = (url, params, config) => buildRequest('post', url, params, config)
+export const put = (url, params, config) => buildRequest('put', url, params, config)
+export const del = (url, params, config) => buildRequest('delete', url, params, config)
 export const postForm = (url, params, config = {
     headers: {
         'Content-Type': 'application/x-www-form-urlencoded'
     }
 }) => buildRequest('post', url, params, config) 
 export const all = iterable => Axios.all(iterable)
-export const cancel = source => cancel
+export const cancel = source.cancel
